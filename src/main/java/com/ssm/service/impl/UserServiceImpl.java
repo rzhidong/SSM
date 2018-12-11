@@ -1,5 +1,7 @@
 package com.ssm.service.impl;
 
+import java.util.List;
+
 import javax.annotation.Resource;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +35,11 @@ public class UserServiceImpl implements UserService{
 	public int deleteUser(User user) {
 		// TODO Auto-generated method stub
 		return userDao.deleteByPrimaryKey(user.getId());
+	}
+
+	public List<User> getAllUsers() {
+		// TODO Auto-generated method stub
+		return userDao.getAllUsers();
 	}
 
 }

@@ -1,5 +1,7 @@
 package com.test;
 
+import java.util.List;
+
 import javax.annotation.Resource;
 
 import org.junit.Test;
@@ -11,6 +13,8 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.alibaba.fastjson.JSON;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.ssm.dao.UserDao;
 import com.ssm.model.User;
 import com.ssm.service.UserService;
@@ -41,4 +45,24 @@ public class TestMyBatis {
         logger.info("值："+user.getUserName());  
         logger.info(JSON.toJSONString(user));  
     }  
+	
+	@Test
+	public void test3() {
+		System.out.println(userService.getAllUsers());
+	}
+	
+    /**
+     * 测试分页方法
+     */
+	@Test
+    public void test4(){
+        int pageNo = 1;
+        int pageSize = 10;
+        PageHelper.startPage(pageNo, pageSize);  //startPage是告诉拦截器说我要开始分页了。分页参数是这两个。
+        List<User> list = userService.getAllUsers();
+        PageInfo<User> page = new PageInfo<User>(list);
+        System.out.println(page.toString());
+ 
+    }
+
 }

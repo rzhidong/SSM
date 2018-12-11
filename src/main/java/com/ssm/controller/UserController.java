@@ -2,6 +2,7 @@ package com.ssm.controller;
 
 import java.io.File;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
@@ -23,6 +24,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.ssm.model.User;
 import com.ssm.service.UserService;
 
@@ -36,7 +39,7 @@ public class UserController {
 	private UserService userService;
 
 	// /user/test?id=1
-	@RequestMapping(value = "/test", method = RequestMethod.GET)
+	@RequestMapping(value = "/get", method = RequestMethod.GET)
 	public String test(HttpServletRequest request, Model model) {
 		int userId = Integer.parseInt(request.getParameter("id"));
 		System.out.println("userId: " + userId);
@@ -54,6 +57,20 @@ public class UserController {
 		model.addAttribute("user", user);
 
 		return "index";
+	}
+	
+	@RequestMapping("/getAll")
+	public String getAll(@RequestParam(required=true,defaultValue="1") Integer page,HttpServletRequest request,Model model) {
+		//page默认值是1，pageSize默认是10，我写的是2 意思是从第1页开始，每页显示2条记录。
+	      PageHelper.startPage(page, 10);
+	      List<User> userList = userService.getAllUsers();
+	      System.out.println(userList);
+	      PageInfo<User> pageInfo=new PageInfo<User>(userList);
+	      model.addAttribute("pageInfo", pageInfo);
+	      model.addAttribute("userList",userList);
+		
+		
+		return "list";
 	}
 
 	@RequestMapping("/insert")
@@ -83,11 +100,10 @@ public class UserController {
 			user.setUserName(String.valueOf(new Date()));
 			userService.updateUser(user);
 			return "update user "+id+" success " + new Date().toString();
-		}else if (user == null) {
+		}else {
 			return "not such user " + id;
 		} 
 		
-		return "update user "+id+" fail " + new Date().toString();
 	}
 	
 	// /user/delete?id=1
@@ -100,20 +116,25 @@ public class UserController {
 			log.info(user.toString());
 			userService.deleteUser(user);
 			return "delete user "+id+" success " + new Date().toString();
-		}else if (user == null) {
+		}else{
 			return "not such user " + id;
 		} 
 		
-		return "delete user "+id+" fail " + new Date().toString();
 	}
 	
 	// /user/{id}
 	@RequestMapping("/json/{id}")
 	public ResponseEntity<User> getUserJson(@PathVariable String id,Map<String, Object> model){
 		User user = userService.getUserById(Integer.parseInt(id));
-		log.info(user.toString());
 		
-		return new ResponseEntity<User>(user,HttpStatus.OK);
+		if (user !=null) {
+			log.info(user.toString());
+			
+			return new ResponseEntity<User>(user,HttpStatus.OK);
+		}else {
+			return new ResponseEntity<User>(user,HttpStatus.NOT_FOUND);
+		}
+		
 	}
 	
 	//文件上传、

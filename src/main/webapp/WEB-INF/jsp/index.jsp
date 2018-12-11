@@ -7,6 +7,7 @@
 <title>Insert title here</title>
 </head>
 <body>
-	hello spring<br>${user }
+	hello spring<br>${user }<br>
+	<a href="<%=request.getContextPath()%>/user/getAll">getAll</a>
 </body>
 </html>
